@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Word Problems - Number Bonds</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #5a67d8;
+            margin-bottom: 20px;
+            font-size: 2.2em;
+        }
+        
+        .progress {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 20px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #48bb78, #38a169);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+        
+        .problem-container {
+            background: #f7fafc;
+            border: 3px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            font-size: 1.3em;
+            line-height: 1.6;
+        }
+        
+        .number-bond {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .bond-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #bee3f8;
+            border: 3px solid #3182ce;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #2d3748;
+        }
+        
+        .bond-line {
+            width: 40px;
+            height: 3px;
+            background: #3182ce;
+        }
+        
+        .missing {
+            background: #fed7d7;
+            border-color: #e53e3e;
+            font-size: 2em;
+            color: #e53e3e;
+        }
+        
+        .answer-section {
+            margin: 25px 0;
+        }
+        
+        #answerInput {
+            font-size: 1.5em;
+            padding: 12px 20px;
+            border: 3px solid #cbd5e0;
+            border-radius: 10px;
+            width: 100px;
+            text-align: center;
+            margin: 0 10px;
+        }
+        
+        #answerInput:focus {
+            outline: none;
+            border-color: #3182ce;
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+        }
+        
+        button {
+            font-size: 1.2em;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .submit-btn {
+            background: #48bb78;
+            color: white;
+        }
+        
+        .submit-btn:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+        }
+        
+        .next-btn {
+            background: #3182ce;
+            color: white;
+        }
+        
+        .next-btn:hover {
+            background: #2c5aa0;
+            transform: translateY(-2px);
+        }
+        
+        .restart-btn {
+            background: #805ad5;
+            color: white;
+        }
+        
+        .restart-btn:hover {
+            background: #6b46c1;
+            transform: translateY(-2px);
+        }
+        
+        .feedback {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .correct {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 2px solid #48bb78;
+        }
+        
+        .incorrect {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 2px solid #e53e3e;
+        }
+        
+        .final-score {
+            background: #e6fffa;
+            border: 3px solid #38b2ac;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        .score-display {
+            font-size: 1.1em;
+            margin: 10px 0;
+            color: #2d3748;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧮 Math Word Problems</h1>
+        <div class="score-display">Question: <span id="questionCount">1</span>/10 | Score: <span id="score">0</span>/10</div>
+        
+        <div class="progress">
+            <div class="progress-bar" id="progressBar" style="width: 10%"></div>
+        </div>
+        
+        <div class="problem-container" id="problemContainer">
+            <div id="problemText"></div>
+            <div class="number-bond" id="numberBond"></div>
+        </div>
+        
+        <div class="answer-section" id="answerSection">
+            <div>What number is missing?</div>
+            <input type="number" id="answerInput" min="0" max="20">
+            <br>
+            <button class="submit-btn" onclick="checkAnswer()">Submit Answer</button>
+        </div>
+        
+        <div id="feedback"></div>
+        <button class="next-btn" id="nextBtn" onclick="nextProblem()" style="display: none;">Next Problem</button>
+        <button class="restart-btn" id="restartBtn" onclick="restartGame()" style="display: none;">Start New Session</button>
+    </div>
+
+    <script>
+        let currentProblem = 1;
+        let score = 0;
+        let currentAnswer = 0;
+        
+        const problemTemplates = [
+            {
+                type: "addition_missing_part",
+                template: "Sarah has {part1} stickers. Her friend gives her some more stickers. Now she has {total} stickers total. How many stickers did her friend give her?",
+                generateBond: () => {
+                    const total = Math.floor(Math.random() * 16) + 5; // 5-20
+                    const part1 = Math.floor(Math.random() * (total - 1)) + 1;
+                    const part2 = total - part1;
+                    return { total, part1, part2, missing: 'part2' };
+                }
+            },
+            {
+                type: "addition_missing_total",
+                template: "Jake has {part1} toy cars and {part2} toy trucks. How many toys does he have altogether?",
+                generateBond: () => {
+                    const part1 = Math.floor(Math.random() * 8) + 2; // 2-9
+                    const part2 = Math.floor(Math.random() * 8) + 2; // 2-9
+                    const total = part1 + part2;
+                    return { total, part1, part2, missing: 'total' };
+                }
+            },
+            {
+                type: "subtraction_missing_part",
+                template: "Emma had {total} cookies. She ate some cookies. Now she has {part2} cookies left. How many cookies did she eat?",
+                generateBond: () => {
+                    const total = Math.floor(Math.random() * 16) + 5; // 5-20
+                    const part2 = Math.floor(Math.random() * (total - 1)) + 1;
+                    const part1 = total - part2;
+                    return { total, part1, part2, missing: 'part1' };
+                }
+            },
+            {
+                type: "subtraction_missing_result",
+                template: "Alex had {total} balloons. {part1} balloons popped. How many balloons does he have left?",
+                generateBond: () => {
+                    const total = Math.floor(Math.random() * 16) + 5; // 5-20
+                    const part1 = Math.floor(Math.random() * (total - 1)) + 1;
+                    const part2 = total - part1;
+                    return { total, part1, part2, missing: 'part2' };
+                }
+            },
+            {
+                type: "collection_problem",
+                template: "Maya collected {part1} shells and {part2} rocks at the beach. How many treasures did she collect in total?",
+                generateBond: () => {
+                    const part1 = Math.floor(Math.random() * 8) + 2;
+                    const part2 = Math.floor(Math.random() * 8) + 2;
+                    const total = part1 + part2;
+                    return { total, part1, part2, missing: 'total' };
+                }
+            }
+        ];
+        
+        function generateProblem() {
+            const template = problemTemplates[Math.floor(Math.random() * problemTemplates.length)];
+            const bond = template.generateBond();
+            
+            const problemText = template.template
+                .replace('{total}', bond.total)
+                .replace('{part1}', bond.part1)
+                .replace('{part2}', bond.part2);
+            
+            return { problemText, bond, template };
+        }
+        
+        function displayProblem() {
+            const problem = generateProblem();
+            const { problemText, bond } = problem;
+            
+            document.getElementById('problemText').innerHTML = problemText;
+            
+            // Create number bond visualization
+            const bondContainer = document.getElementById('numberBond');
+            bondContainer.innerHTML = '';
+            
+            // Determine which value is missing and set current answer
+            switch(bond.missing) {
+                case 'total':
+                    currentAnswer = bond.total;
+                    bondContainer.innerHTML = `
+                        <div class="bond-circle missing">?</div>
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <div class="bond-line" style="transform: rotate(45deg); margin-bottom: 10px;"></div>
+                            <div class="bond-line" style="transform: rotate(-45deg);"></div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 20px;">
+                            <div class="bond-circle">${bond.part1}</div>
+                            <div class="bond-circle">${bond.part2}</div>
+                        </div>
+                    `;
+                    break;
+                case 'part1':
+                    currentAnswer = bond.part1;
+                    bondContainer.innerHTML = `
+                        <div class="bond-circle">${bond.total}</div>
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <div class="bond-line" style="transform: rotate(45deg); margin-bottom: 10px;"></div>
+                            <div class="bond-line" style="transform: rotate(-45deg);"></div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 20px;">
+                            <div class="bond-circle missing">?</div>
+                            <div class="bond-circle">${bond.part2}</div>
+                        </div>
+                    `;
+                    break;
+                case 'part2':
+                    currentAnswer = bond.part2;
+                    bondContainer.innerHTML = `
+                        <div class="bond-circle">${bond.total}</div>
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <div class="bond-line" style="transform: rotate(45deg); margin-bottom: 10px;"></div>
+                            <div class="bond-line" style="transform: rotate(-45deg);"></div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 20px;">
+                            <div class="bond-circle">${bond.part1}</div>
+                            <div class="bond-circle missing">?</div>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            // Clear previous state
+            document.getElementById('answerInput').value = '';
+            document.getElementById('feedback').innerHTML = '';
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('answerSection').style.display = 'block';
+            document.getElementById('answerInput').focus();
+        }
+        
+        function checkAnswer() {
+            const userAnswer = parseInt(document.getElementById('answerInput').value);
+            const feedbackDiv = document.getElementById('feedback');
+            
+            if (isNaN(userAnswer)) {
+                feedbackDiv.innerHTML = '<div class="feedback incorrect">Please enter a number!</div>';
+                return;
+            }
+            
+            if (userAnswer === currentAnswer) {
+                feedbackDiv.innerHTML = '<div class="feedback correct">🎉 Correct! Great job!</div>';
+                score++;
+            } else {
+                feedbackDiv.innerHTML = `<div class="feedback incorrect">Not quite right. The answer is ${currentAnswer}. Keep trying!</div>`;
+            }
+            
+            document.getElementById('score').textContent = score;
+            document.getElementById('answerSection').style.display = 'none';
+            
+            if (currentProblem < 10) {
+                document.getElementById('nextBtn').style.display = 'inline-block';
+            } else {
+                showFinalScore();
+            }
+        }
+        
+        function nextProblem() {
+            currentProblem++;
+            document.getElementById('questionCount').textContent = currentProblem;
+            document.getElementById('progressBar').style.width = (currentProblem * 10) + '%';
+            displayProblem();
+        }
+        
+        function showFinalScore() {
+            const percentage = Math.round((score / 10) * 100);
+            let message = '';
+            
+            if (percentage >= 90) {
+                message = '🌟 Outstanding work! You\'re a math superstar!';
+            } else if (percentage >= 70) {
+                message = '👍 Great job! You\'re getting really good at this!';
+            } else if (percentage >= 50) {
+                message = '😊 Good effort! Keep practicing and you\'ll improve!';
+            } else {
+                message = '🤗 Nice try! Math takes practice - you\'ll do better next time!';
+            }
+            
+            document.getElementById('problemContainer').innerHTML = `
+                <div class="final-score">
+                    <h2>Session Complete!</h2>
+                    <div style="font-size: 2em; margin: 20px 0;">🎯</div>
+                    <div>You got ${score} out of 10 questions correct!</div>
+                    <div>That's ${percentage}%!</div>
+                    <div style="margin-top: 15px; font-size: 1.2em;">${message}</div>
+                </div>
+            `;
+            
+            document.getElementById('restartBtn').style.display = 'inline-block';
+        }
+        
+        function restartGame() {
+            currentProblem = 1;
+            score = 0;
+            document.getElementById('questionCount').textContent = '1';
+            document.getElementById('score').textContent = '0';
+            document.getElementById('progressBar').style.width = '10%';
+            document.getElementById('restartBtn').style.display = 'none';
+            displayProblem();
+        }
+        
+        // Allow Enter key to submit answer
+        document.getElementById('answerInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+        
+        // Start the first problem
+        displayProblem();
+    </script>
+</body>
+</html>
