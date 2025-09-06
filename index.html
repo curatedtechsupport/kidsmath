@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Math Word Problems - Number Bonds</title>
+    <title>Math Word Problems - Number Bonds & Number Lines</title>
     <style>
         body {
             font-family: 'Comic Sans MS', cursive, sans-serif;
@@ -21,7 +21,7 @@
             border-radius: 20px;
             padding: 30px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            max-width: 600px;
+            max-width: 700px;
             width: 100%;
             text-align: center;
         }
@@ -57,11 +57,31 @@
             line-height: 1.6;
         }
         
+        .visual-tools {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin: 25px 0;
+        }
+        
+        .tool-section {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .tool-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #4a5568;
+            margin-bottom: 15px;
+        }
+        
         .number-bond {
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 20px 0;
             gap: 15px;
             flex-wrap: wrap;
         }
@@ -91,6 +111,76 @@
             border-color: #e53e3e;
             font-size: 2em;
             color: #e53e3e;
+        }
+        
+        .number-line {
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .line {
+            height: 4px;
+            background: #4a5568;
+            margin: 30px 0;
+            position: relative;
+        }
+        
+        .tick {
+            position: absolute;
+            width: 2px;
+            height: 20px;
+            background: #4a5568;
+            top: -8px;
+        }
+        
+        .tick-label {
+            position: absolute;
+            top: 25px;
+            transform: translateX(-50%);
+            font-size: 14px;
+            font-weight: bold;
+            color: #2d3748;
+        }
+        
+        .jump {
+            position: absolute;
+            top: -25px;
+            height: 20px;
+            border: 3px solid #e53e3e;
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .jump-label {
+            position: absolute;
+            top: -45px;
+            transform: translateX(-50%);
+            background: #e53e3e;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .start-dot {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #48bb78;
+            border-radius: 50%;
+            top: -4px;
+            transform: translateX(-50%);
+        }
+        
+        .end-dot {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #3182ce;
+            border-radius: 50%;
+            top: -4px;
+            transform: translateX(-50%);
         }
         
         .answer-section {
@@ -186,6 +276,22 @@
             margin: 10px 0;
             color: #2d3748;
         }
+        
+        @media (max-width: 600px) {
+            .visual-tools {
+                gap: 20px;
+            }
+            
+            .tool-section {
+                padding: 15px;
+            }
+            
+            .bond-circle {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2em;
+            }
+        }
     </style>
 </head>
 <body>
@@ -199,7 +305,18 @@
         
         <div class="problem-container" id="problemContainer">
             <div id="problemText"></div>
-            <div class="number-bond" id="numberBond"></div>
+            
+            <div class="visual-tools">
+                <div class="tool-section">
+                    <div class="tool-title">📊 Number Bond</div>
+                    <div class="number-bond" id="numberBond"></div>
+                </div>
+                
+                <div class="tool-section" id="numberLineSection">
+                    <div class="tool-title">📏 Number Line</div>
+                    <div class="number-line" id="numberLineContainer"></div>
+                </div>
+            </div>
         </div>
         
         <div class="answer-section" id="answerSection">
@@ -228,7 +345,8 @@
                     const part1 = Math.floor(Math.random() * (total - 1)) + 1;
                     const part2 = total - part1;
                     return { total, part1, part2, missing: 'part2' };
-                }
+                },
+                numberLineType: 'addition'
             },
             {
                 type: "addition_missing_total",
@@ -238,7 +356,8 @@
                     const part2 = Math.floor(Math.random() * 8) + 2; // 2-9
                     const total = part1 + part2;
                     return { total, part1, part2, missing: 'total' };
-                }
+                },
+                numberLineType: 'addition'
             },
             {
                 type: "subtraction_missing_part",
@@ -248,7 +367,8 @@
                     const part2 = Math.floor(Math.random() * (total - 1)) + 1;
                     const part1 = total - part2;
                     return { total, part1, part2, missing: 'part1' };
-                }
+                },
+                numberLineType: 'subtraction'
             },
             {
                 type: "subtraction_missing_result",
@@ -258,7 +378,8 @@
                     const part1 = Math.floor(Math.random() * (total - 1)) + 1;
                     const part2 = total - part1;
                     return { total, part1, part2, missing: 'part2' };
-                }
+                },
+                numberLineType: 'subtraction'
             },
             {
                 type: "collection_problem",
@@ -268,7 +389,30 @@
                     const part2 = Math.floor(Math.random() * 8) + 2;
                     const total = part1 + part2;
                     return { total, part1, part2, missing: 'total' };
-                }
+                },
+                numberLineType: 'addition'
+            },
+            {
+                type: "counting_on",
+                template: "Tom starts counting at {part1}. He counts on {part2} more numbers. What number does he end up at?",
+                generateBond: () => {
+                    const part1 = Math.floor(Math.random() * 8) + 2; // 2-9
+                    const part2 = Math.floor(Math.random() * 6) + 2; // 2-7
+                    const total = part1 + part2;
+                    return { total, part1, part2, missing: 'total' };
+                },
+                numberLineType: 'counting'
+            },
+            {
+                type: "counting_back",
+                template: "Lisa starts at {total} and counts back {part1} numbers. What number does she land on?",
+                generateBond: () => {
+                    const total = Math.floor(Math.random() * 12) + 8; // 8-19
+                    const part1 = Math.floor(Math.random() * (total - 2)) + 2;
+                    const part2 = total - part1;
+                    return { total, part1, part2, missing: 'part2' };
+                },
+                numberLineType: 'counting_back'
             }
         ];
         
@@ -284,9 +428,90 @@
             return { problemText, bond, template };
         }
         
+        function createNumberLine(bond, numberLineType, missing) {
+            const container = document.getElementById('numberLineContainer');
+            const maxNum = Math.max(bond.total, 20);
+            const lineWidth = Math.min(600, container.offsetWidth - 40);
+            
+            let html = '<div class="line" style="width: ' + lineWidth + 'px; margin: 0 auto;">';
+            
+            // Create ticks and labels
+            for (let i = 0; i <= maxNum; i++) {
+                const position = (i / maxNum) * lineWidth;
+                html += `<div class="tick" style="left: ${position}px;"></div>`;
+                html += `<div class="tick-label" style="left: ${position}px;">${i}</div>`;
+            }
+            
+            // Add visual elements based on problem type
+            if (numberLineType === 'addition') {
+                const startPos = (bond.part1 / maxNum) * lineWidth;
+                const endPos = (bond.total / maxNum) * lineWidth;
+                const jumpWidth = endPos - startPos;
+                
+                html += `<div class="start-dot" style="left: ${startPos}px;"></div>`;
+                html += `<div class="end-dot" style="left: ${endPos}px;"></div>`;
+                
+                if (missing !== 'part2') {
+                    html += `<div class="jump" style="left: ${startPos}px; width: ${jumpWidth}px;"></div>`;
+                    html += `<div class="jump-label" style="left: ${startPos + jumpWidth/2}px;">+${bond.part2}</div>`;
+                } else {
+                    html += `<div class="jump" style="left: ${startPos}px; width: ${jumpWidth}px; border-color: #fbb6ce;"></div>`;
+                    html += `<div class="jump-label" style="left: ${startPos + jumpWidth/2}px; background: #fbb6ce; color: #742a2a;">+?</div>`;
+                }
+            } else if (numberLineType === 'subtraction') {
+                const startPos = (bond.total / maxNum) * lineWidth;
+                const endPos = (bond.part2 / maxNum) * lineWidth;
+                const jumpWidth = startPos - endPos;
+                
+                html += `<div class="start-dot" style="left: ${startPos}px;"></div>`;
+                html += `<div class="end-dot" style="left: ${endPos}px;"></div>`;
+                
+                if (missing !== 'part1') {
+                    html += `<div class="jump" style="left: ${endPos}px; width: ${jumpWidth}px; border-color: #f56565;"></div>`;
+                    html += `<div class="jump-label" style="left: ${endPos + jumpWidth/2}px; background: #f56565;">-${bond.part1}</div>`;
+                } else {
+                    html += `<div class="jump" style="left: ${endPos}px; width: ${jumpWidth}px; border-color: #fbb6ce;"></div>`;
+                    html += `<div class="jump-label" style="left: ${endPos + jumpWidth/2}px; background: #fbb6ce; color: #742a2a;">-?</div>`;
+                }
+            } else if (numberLineType === 'counting') {
+                const startPos = (bond.part1 / maxNum) * lineWidth;
+                const endPos = (bond.total / maxNum) * lineWidth;
+                const jumpWidth = endPos - startPos;
+                
+                html += `<div class="start-dot" style="left: ${startPos}px;"></div>`;
+                
+                if (missing !== 'total') {
+                    html += `<div class="end-dot" style="left: ${endPos}px;"></div>`;
+                    html += `<div class="jump" style="left: ${startPos}px; width: ${jumpWidth}px; border-color: #9f7aea;"></div>`;
+                    html += `<div class="jump-label" style="left: ${startPos + jumpWidth/2}px; background: #9f7aea;">+${bond.part2}</div>`;
+                } else {
+                    html += `<div class="jump" style="left: ${startPos}px; width: ${jumpWidth}px; border-color: #fbb6ce;"></div>`;
+                    html += `<div class="jump-label" style="left: ${startPos + jumpWidth/2}px; background: #fbb6ce; color: #742a2a;">+${bond.part2}</div>`;
+                }
+            } else if (numberLineType === 'counting_back') {
+                const startPos = (bond.total / maxNum) * lineWidth;
+                const endPos = (bond.part2 / maxNum) * lineWidth;
+                const jumpWidth = startPos - endPos;
+                
+                html += `<div class="start-dot" style="left: ${startPos}px;"></div>`;
+                
+                if (missing !== 'part2') {
+                    html += `<div class="end-dot" style="left: ${endPos}px;"></div>`;
+                    html += `<div class="jump" style="left: ${endPos}px; width: ${jumpWidth}px; border-color: #f56565;"></div>`;
+                    html += `<div class="jump-label" style="left: ${endPos + jumpWidth/2}px; background: #f56565;">-${bond.part1}</div>`;
+                } else {
+                    html += `<div class="jump" style="left: ${endPos}px; width: ${jumpWidth}px; border-color: #fbb6ce;"></div>`;
+                    html += `<div class="jump-label" style="left: ${endPos + jumpWidth/2}px; background: #fbb6ce; color: #742a2a;">-${bond.part1}</div>`;
+                }
+            }
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+        
         function displayProblem() {
             const problem = generateProblem();
-            const { problemText, bond } = problem;
+            const { problemText, bond, template } = problem;
             
             document.getElementById('problemText').innerHTML = problemText;
             
@@ -339,6 +564,9 @@
                     `;
                     break;
             }
+            
+            // Create number line visualization
+            createNumberLine(bond, template.numberLineType, bond.missing);
             
             // Clear previous state
             document.getElementById('answerInput').value = '';
